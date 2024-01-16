@@ -13,6 +13,7 @@
 typedef struct {
 	float x, y;
 	short lives;
+	int alive, visible;
 } Move;
 
 typedef struct {
@@ -25,6 +26,8 @@ typedef struct {
 
 typedef struct {
 	float x, y, w, h;
+	int visibleBig, visibleMedium, visibleSmall;
+	int aliveBig, aliveMedium, aliveSmall;
 } Rocks;
 
 typedef struct {
