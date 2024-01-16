@@ -25,6 +25,7 @@ typedef struct {
 } Stars;
 
 typedef struct {
+	float velocity;
 	float x, y, w, h;
 	int visibleBig, visibleMedium, visibleSmall;
 	int aliveBig, aliveMedium, aliveSmall;
