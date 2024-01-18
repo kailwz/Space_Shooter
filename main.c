@@ -6,6 +6,7 @@
 #include "status.h"
 
 Bullet *bullets[MAXIMUM_PROJECTILES] = { NULL };
+Rocks *rocks[MAXIMUM_ASTEROIDS] = {	NULL};
 
 void loadGame (GameState *game) {
 	
@@ -16,15 +17,6 @@ void loadGame (GameState *game) {
 	game->move.y = 215;
 	game->move.alive = 1;
 	game->move.visible = 1;
-
-	// Asteroids
-	game->rocks[0].aliveBig = 1;
-	game->rocks[1].aliveMedium = 1;
-	game->rocks[2].aliveSmall = 1;
-
-	game->rocks[0].visibleBig = 1;
-	game->rocks[1].visibleMedium = 1;
-	game->rocks[2].visibleSmall = 1;
 
 	// Game
 	game->label = NULL;
@@ -75,7 +67,7 @@ void loadGame (GameState *game) {
 	game->rock[0] = SDL_CreateTextureFromSurface(game->renderer, surface);
 	SDL_FreeSurface(surface);
 
-	// Medium Asteroid image
+	/*/ Medium Asteroid image
 	surface = IMG_Load("images/medium_rock.png");
 
 	if (surface == NULL) {
@@ -97,7 +89,7 @@ void loadGame (GameState *game) {
 	}
 	
 	game->rock[2] = SDL_CreateTextureFromSurface(game->renderer, surface);
-	SDL_FreeSurface(surface);
+	SDL_FreeSurface(surface);*/
 
 	// Screen text
 	game->font = TTF_OpenFont("fonts/crazy-pixel.ttf", 56);
@@ -122,25 +114,6 @@ void loadGame (GameState *game) {
 	game->bullet = SDL_CreateTextureFromSurface(game->renderer, surface);
 	SDL_FreeSurface(surface);
 
-	if (game->time % 24 == 0) {
-		// big Asteroid info
-		game->rocks[0].w = 45;
-		game->rocks[0].h = 45;
-		game->rocks[0].x = random()%640;
-		game->rocks[0].y = -100;
-	
-		// Medium Asteroid info
-		game->rocks[1].w = 35;
-		game->rocks[1].h = 35;
-		game->rocks[1].x = random()%640;
-		game->rocks[1].y = -100;
-	
-		// Small Asteroid info
-		game->rocks[2].w = 25;
-		game->rocks[2].h = 25;
-		game->rocks[2].x = random()%640;
-		game->rocks[2].y = -100;
-	}
 }
 
 void spawnBullet (float x, float y, float dx, float dy) {
@@ -169,6 +142,32 @@ void deleteBullet (int i) {
 	}
 }
 
+void spawnBigAsteroids (float x, float y, float dx, float dy) {
+	int foundBig = -1;
+	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) {
+		if (rocks[i] == NULL) {
+			foundBig = i;
+			break;
+		}
+	}
+
+	if (foundBig >= 0) {
+		int i = foundBig;
+		rocks[i] = malloc(sizeof(Rocks));
+		rocks[i]->x = x;
+		rocks[i]->y = y;
+		rocks[i]->dx = dx;
+		rocks[i]->dy = dy;
+	}
+}
+
+void deleteBigAsteroids (int i) {
+	if (rocks[i]) {
+		free(rocks[i]);
+		rocks[i] = NULL;
+	}
+}
+
 void process (GameState *game) {
 	game->time++;
 		
@@ -177,14 +176,8 @@ void process (GameState *game) {
 		shutdown_status_lives(game);
 		game->status = STATUS_GAME;
 	}
-	
-	if (game->status == STATUS_GAME) {
-		game->rocks[0].y += 1;
-		game->rocks[1].y += 1;
-		game->rocks[2].y += 1;
-	}
 
-	if (game->status == STATUS_GAME) {
+	if (game->status == STATUS_GAME && game->move.alive) {
 		// Player Movements
 		const Uint8 *state = SDL_GetKeyboardState(NULL);
 		if (state[SDL_SCANCODE_A]) {
@@ -212,52 +205,25 @@ void process (GameState *game) {
 	for (int i = 0; i < MAXIMUM_PROJECTILES; i++) if (bullets[i]) {
 		bullets[i]->x += bullets[i]->dx;
 		bullets[i]->y += bullets[i]->dy;
-		
-		// Big bullet colision
-		if (bullets[i]->x > game->rocks[0].x && bullets[i]->x < game->rocks[0].x+45 && 
-		bullets[i]->y > game->rocks[0].y && bullets[i]->y < game->rocks[0].y+45) {
-			game->rocks[0].aliveBig = 0;
-		}
-		
-		// Medium bullet colision
-		if (bullets[i]->x > game->rocks[1].x && bullets[i]->x < game->rocks[1].x+35 && 
-		bullets[i]->y > game->rocks[1].y && bullets[i]->y < game->rocks[1].y+35) {
-			game->rocks[1].aliveMedium = 0;
-		}
-
-		// Small bullet colision
-		if (bullets[i]->x > game->rocks[2].x && bullets[i]->x < game->rocks[2].x+25 && 
-		bullets[i]->y > game->rocks[2].y && bullets[i]->y < game->rocks[2].y+25) {
-			game->rocks[2].aliveSmall = 0;
-		}
 
 		// Delete bullets
 		if (bullets[i]->y < -1000 || bullets[i]->y > 1000) {
 			deleteBullet(i);
 		}
+	}
 
-		// Destroyed big asteroids treatment
-		if (game->rocks[0].aliveBig == 0) {
-			game->rocks[0].x = random()%640;
-			game->rocks[0].y = -100;
-			game->rocks[0].visibleBig = 0;
-			game->rocks[0].aliveBig = 0;
-		}
-		
-		// Destroyed medium asteroids treatment
-		if (game->rocks[1].aliveMedium == 0) {
-			game->rocks[1].x = random()%640;
-			game->rocks[1].y = -100;
-			game->rocks[1].visibleMedium = 0;
-			game->rocks[1].aliveMedium = 0;
-		}
-		
-		// Destroyed small asteroids treatment
-		if (game->rocks[2].aliveSmall == 0) {
-			game->rocks[2].x = random()%640;
-			game->rocks[2].y = -100;
-			game->rocks[2].visibleSmall = 0;
-			game->rocks[2].aliveSmall = 0;
+	// Move the big asteroids
+	if (game->time % 56 == 0) {
+		spawnBigAsteroids(random()%640-45, -45, 0, 3);
+	}
+	
+	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (rocks[i]) {
+		rocks[i]->x += rocks[i]->dx;
+		rocks[i]->y += rocks[i]->dy;
+
+		// Delete big asteroids
+		if (rocks[i]->y < -1000 || rocks[i]->y > 1000) {
+			deleteBigAsteroids(i);
 		}
 	}
 
@@ -265,10 +231,8 @@ void process (GameState *game) {
 
 void detectColision (GameState *game) {
 	float space = 0, ww = 640 - 24, wh = 480 - 24;
-	float pw = 24, ph = 24, px = game->move.x, py = game->move.y;
-	float rx = game->rocks[0].x, ry = game->rocks[0].y, rw = game->rocks[0].w, rh = game->rocks[0].h;
-	float rmx = game->rocks[1].x, rmy = game->rocks[1].y, rmw = game->rocks[1].w, rmh = game->rocks[1].h;
-	float rsx = game->rocks[2].x, rsy = game->rocks[2].y, rsw = game->rocks[2].w, rsh = game->rocks[2].h;
+	float /*pw = 24, ph = 24,*/ px = game->move.x, py = game->move.y;
+	/*float rx = rocks[0]->x, ry = rocks[0]->y, rw = rocks[0]->w, rh = rocks[0]->h;*/
 
 	// Window collision
 	if (px <= space) {
@@ -292,107 +256,6 @@ void detectColision (GameState *game) {
 		game->move.y = wh;
 	}
 
-	// Big Asteroid collision 
-	if (py+ph > ry && py < ry+rh) {
-		if (px < rx+rw && px+pw > rx+rw) {
-			game->move.x = rx+rh;
-			px = rx+rw;
-			game->move.visible = 0;
-			game->move.alive = 0;
-			SDL_DestroyTexture(game->player);
-		}
-		else if (px+pw > rx && px < rx) {
-			game->move.x = rx-pw;
-			px = rx-pw;
-			game->move.visible = 0;
-			game->move.alive = 0;
-			SDL_DestroyTexture(game->player);
-		}
-	}
-	if (px+pw > rx && px < rx+rw) {
-		if (py < ry+rh && py > ry) {
-			game->move.y = ry+rw;
-			py = ry+rh;
-			game->move.visible = 0;
-			game->move.alive = 0;
-			SDL_DestroyTexture(game->player);
-		}
-		else if (py+ph > ry && py < ry) {
-			game->move.y = ry-ph;
-			py = ry-ph;
-			game->move.visible = 0;
-			game->move.alive = 0;
-			SDL_DestroyTexture(game->player);
-		}
-	}
-
-	// Medium Asteroid collision 
-	if (py+ph > rmy && py < rmy+rmh) {
-		if (px < rmx+rmw && px+pw > rmx+rmw) {
-			game->move.x = rmx+rmh;
-			px = rmx+rmw;
-			game->move.visible = 0;
-			game->move.alive = 0;
-			SDL_DestroyTexture(game->player);
-		}
-		else if (px+pw > rx && px < rmx) {
-			game->move.x = rmx-pw;
-			px = rmx-pw;
-			game->move.visible = 0;
-			game->move.alive = 0;
-			SDL_DestroyTexture(game->player);
-		}
-	}
-	if (px+pw > rmx && px < rmx+rmw) {
-		if (py < rmy+rmh && py > rmy) {
-			game->move.y = rmy+rmw;
-			py = rmy+rmh;
-			game->move.visible = 0;
-			game->move.alive = 0;
-			SDL_DestroyTexture(game->player);
-		}
-		else if (py+ph > rmy && py < rmy) {
-			game->move.y = rmy-ph;
-			py = rmy-ph;
-			game->move.visible = 0;
-			game->move.alive = 0;
-			SDL_DestroyTexture(game->player);
-		}
-	}
-
-	// Small Asteroid collision 
-	if (py+ph > rsy && py < rsy+rsh) {
-		if (px < rsx+rsw && px+pw > rsx+rsw) {
-			game->move.x = rsx+rsh;
-			px = rsx+rsw;
-			game->move.visible = 0;
-			game->move.alive = 0;
-			SDL_DestroyTexture(game->player);
-		}
-		else if (px+pw > rsx && px < rsx) {
-			game->move.x = rsx-pw;
-			px = rsx-pw;
-			game->move.visible = 0;
-			game->move.alive = 0;
-			SDL_DestroyTexture(game->player);
-		}
-	}
-	if (px+pw > rsx && px < rsx+rsw) {
-		if (py < rsy+rsh && py > rsy) {
-			game->move.y = rsy+rsw;
-			py = rsy+rsh;
-			game->move.visible = 0;
-			game->move.alive = 0;
-			SDL_DestroyTexture(game->player);
-		}
-		else if (py+ph > rsy && py < rsy) {
-			game->move.y = rsy-ph;
-			py = rsy-ph;
-			game->move.visible = 0;
-			game->move.alive = 0;
-			SDL_DestroyTexture(game->player);
-		}
-	}
 }
 
 int eventProcessing (SDL_Window *window, GameState *game) {
@@ -435,35 +298,23 @@ void loadRender (SDL_Renderer *renderer, GameState *game) {
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
 		SDL_RenderClear(renderer);
-
+		
+		// Player
 		if (game->move.visible) {
-			// Player
 			SDL_Rect playerRect = {game->move.x, game->move.y, 24, 24};	
 			SDL_RenderCopyEx(renderer, game->player, NULL, &playerRect, 0, NULL, 0);
 		}
 
-			// Stars
+		// Stars
 		for (int i = 0; i < 100; i++) {
 			SDL_Rect starRect = {game->stars[i].x, game->stars[i].y, 1, 1};
 			SDL_RenderCopy(renderer, game->star, NULL, &starRect);
 		}
 		
-		if (game->rocks[0].visibleBig) {
-			// Big Asteroid
-			SDL_Rect bigrockRect = {game->rocks[0].x, game->rocks[0].y, 45, 45};
-			SDL_RenderCopyEx(renderer, game->rock[0], NULL, &bigrockRect, 0, NULL, 0);
-		}
-
-		if (game->rocks[1].visibleMedium) {
-			// Medium Asteroid
-			SDL_Rect mediumrockRect = {game->rocks[1].x, game->rocks[1].y, 35, 35};
-			SDL_RenderCopyEx(renderer, game->rock[1], NULL, &mediumrockRect, 0, NULL, 0);
-		}
-
-		if (game->rocks[2].visibleSmall) {
-			// Small Asteroid
-			SDL_Rect smallrockRect = {game->rocks[2].x ,game->rocks[2].y, 25, 25};
-			SDL_RenderCopyEx(renderer, game->rock[2], NULL, &smallrockRect, 0, NULL, 0);
+		// Big Asteroid
+		for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (rocks[i]) {
+			SDL_Rect bigrockRect = {rocks[i]->x, rocks[i]->y, 45, 45};
+			SDL_RenderCopy(renderer, game->rock[0], NULL, &bigrockRect);
 		}
 
 		// Bullets
@@ -522,9 +373,9 @@ int main (int argc, char *argv[]) {
 
 	// Clean Textures
 	SDL_DestroyTexture(gameState.player);
-	SDL_DestroyTexture(gameState.rock[0]);
+	SDL_DestroyTexture(gameState.rock[0]);/*
 	SDL_DestroyTexture(gameState.rock[1]);
-	SDL_DestroyTexture(gameState.rock[2]);
+	SDL_DestroyTexture(gameState.rock[2]);*/
 	SDL_DestroyTexture(gameState.star);
 	SDL_DestroyTexture(gameState.bullet);
 	SDL_DestroyWindow(window);
@@ -551,4 +402,42 @@ int main (int argc, char *argv[]) {
 // https://www.youtube.com/shorts/MZaShGcVBLw
 // https://www.youtube.com/watch?v=OJrX3aNPsHM
 // https://stackoverflow.com/questions/69366699/why-does-the-compiler-is-giving-me-this-undefined-reference-to-function
+
 // to compile gcc -Wall -Werror status.c main.c `sdl2-config --cflags --libs` -o
+
+/*
+// Usefull Player vs enemy collision
+float pw = 24, ph = 24, px = game->move.x, py = game->move.y;
+float rx = game->rocks[0].x, ry = game->rocks[0].y, rw = game->rocks[0].w, rh = game->rocks[0].h;
+
+if (game->status == STATUS_GAME && game->rocks[0].aliveBig) {
+	if (py+ph > ry && py < ry+rh) {
+		if (px < rx+rw && px+pw > rx+rw) {
+			game->move.x = rx+rh;
+			px = rx+rw;
+			game->move.visible = 0;
+			game->move.alive = 0;
+		}
+		else if (px+pw > rx && px < rx) {
+			game->move.x = rx-pw;
+			px = rx-pw;
+			game->move.visible = 0;
+			game->move.alive = 0;
+		}
+	}
+	if (px+pw > rx && px < rx+rw) {
+		if (py < ry+rh && py > ry) {
+			game->move.y = ry+rw;
+			py = ry+rh;
+			game->move.visible = 0;
+			game->move.alive = 0;
+		}
+		else if (py+ph > ry && py < ry) {
+			game->move.y = ry-ph;
+			py = ry-ph;
+			game->move.visible = 0;
+			game->move.alive = 0;
+		}
+	}
+}
+*/

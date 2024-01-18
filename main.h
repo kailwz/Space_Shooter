@@ -5,6 +5,8 @@
 #define STATUS_GAME 1
 #define STATUS_GAMEOVER 2
 #define MAXIMUM_PROJECTILES 1000
+#define MAXIMUM_ASTEROIDS 1000
+#define MAXIMUM_ASTEROIDS_M 1000
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -26,7 +28,7 @@ typedef struct {
 
 typedef struct {
 	float velocity;
-	float x, y, w, h;
+	float x, y, w, h, dx, dy;
 	int visibleBig, visibleMedium, visibleSmall;
 	int aliveBig, aliveMedium, aliveSmall;
 } Rocks;
@@ -38,7 +40,6 @@ typedef struct {
 	// Structures
 	Move move;
 	Stars stars[100];
-	Rocks rocks[3];
 
 	// Textures
 	SDL_Texture *rock[3];
