@@ -6,7 +6,9 @@
 #include "status.h"
 
 Bullet *bullets[MAXIMUM_PROJECTILES] = { NULL };
-Rocks *rocks[MAXIMUM_ASTEROIDS] = {	NULL};
+bigRocks *bigrocks[MAXIMUM_ASTEROIDS] = {	NULL};
+mediumRocks *mediumrocks[MAXIMUM_ASTEROIDS] = {	NULL};
+smallRocks *smallrocks[MAXIMUM_ASTEROIDS] = {	NULL};
 
 void loadGame (GameState *game) {
 	
@@ -67,7 +69,7 @@ void loadGame (GameState *game) {
 	game->rock[0] = SDL_CreateTextureFromSurface(game->renderer, surface);
 	SDL_FreeSurface(surface);
 
-	/*/ Medium Asteroid image
+	// Medium Asteroid image
 	surface = IMG_Load("images/medium_rock.png");
 
 	if (surface == NULL) {
@@ -89,7 +91,7 @@ void loadGame (GameState *game) {
 	}
 	
 	game->rock[2] = SDL_CreateTextureFromSurface(game->renderer, surface);
-	SDL_FreeSurface(surface);*/
+	SDL_FreeSurface(surface);
 
 	// Screen text
 	game->font = TTF_OpenFont("fonts/crazy-pixel.ttf", 56);
@@ -143,28 +145,80 @@ void deleteBullet (int i) {
 }
 
 void spawnBigAsteroids (float x, float y, float dx, float dy) {
-	int foundBig = -1;
+	int found = -1;
 	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) {
-		if (rocks[i] == NULL) {
-			foundBig = i;
+		if (bigrocks[i] == NULL) {
+			found = i;
 			break;
 		}
 	}
 
-	if (foundBig >= 0) {
-		int i = foundBig;
-		rocks[i] = malloc(sizeof(Rocks));
-		rocks[i]->x = x;
-		rocks[i]->y = y;
-		rocks[i]->dx = dx;
-		rocks[i]->dy = dy;
+	if (found >= 0) {
+		int i = found;
+		bigrocks[i] = malloc(sizeof(bigRocks));
+		bigrocks[i]->x = x;
+		bigrocks[i]->y = y;
+		bigrocks[i]->dx = dx;
+		bigrocks[i]->dy = dy;
 	}
 }
 
 void deleteBigAsteroids (int i) {
-	if (rocks[i]) {
-		free(rocks[i]);
-		rocks[i] = NULL;
+	if (bigrocks[i]) {
+		free(bigrocks[i]);
+		bigrocks[i] = NULL;
+	}
+}
+
+void spawnMediumAsteroids (float x, float y, float dx, float dy) {
+	int found = -1;
+	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) {
+		if (mediumrocks[i] == NULL) {
+			found = i;
+			break;
+		}
+	}
+
+	if (found >= 0) {
+		int i = found;
+		mediumrocks[i] = malloc(sizeof(bigRocks));
+		mediumrocks[i]->x = x;
+		mediumrocks[i]->y = y;
+		mediumrocks[i]->dx = dx;
+		mediumrocks[i]->dy = dy;
+	}
+}
+
+void deleteMediumAsteroids (int i) {
+	if (mediumrocks[i]) {
+		free(mediumrocks[i]);
+		mediumrocks[i] = NULL;
+	}
+}
+
+void spawnSmallAsteroids (float x, float y, float dx, float dy) {
+	int found = -1;
+	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) {
+		if (smallrocks[i] == NULL) {
+			found = i;
+			break;
+		}
+	}
+
+	if (found >= 0) {
+		int i = found;
+		smallrocks[i] = malloc(sizeof(smallRocks));
+		smallrocks[i]->x = x;
+		smallrocks[i]->y = y;
+		smallrocks[i]->dx = dx;
+		smallrocks[i]->dy = dy;
+	}
+}
+
+void deleteSmallAsteroids (int i) {
+	if (smallrocks[i]) {
+		free(smallrocks[i]);
+		smallrocks[i] = NULL;
 	}
 }
 
@@ -177,8 +231,8 @@ void process (GameState *game) {
 		game->status = STATUS_GAME;
 	}
 
+	// Player Movements
 	if (game->status == STATUS_GAME && game->move.alive) {
-		// Player Movements
 		const Uint8 *state = SDL_GetKeyboardState(NULL);
 		if (state[SDL_SCANCODE_A]) {
 			game->move.x -= 5;
@@ -214,16 +268,46 @@ void process (GameState *game) {
 
 	// Move the big asteroids
 	if (game->time % 56 == 0) {
-		spawnBigAsteroids(random()%640-45, -45, 0, 3);
+		spawnBigAsteroids(random()%640-45, -50, 0, 2);
 	}
 	
-	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (rocks[i]) {
-		rocks[i]->x += rocks[i]->dx;
-		rocks[i]->y += rocks[i]->dy;
+	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (bigrocks[i]) {
+		bigrocks[i]->x += bigrocks[i]->dx;
+		bigrocks[i]->y += bigrocks[i]->dy;
 
 		// Delete big asteroids
-		if (rocks[i]->y < -1000 || rocks[i]->y > 1000) {
+		if (bigrocks[i]->y < -1000 || bigrocks[i]->y > 1000) {
 			deleteBigAsteroids(i);
+		}
+	}
+
+	// Move the medium asteroids
+	if (game->time % 52 == 0) {
+		spawnMediumAsteroids(random()%640-35, -50, 0, 3);
+	}
+	
+	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (mediumrocks[i]) {
+		mediumrocks[i]->x += mediumrocks[i]->dx;
+		mediumrocks[i]->y += mediumrocks[i]->dy;
+
+		// Delete medium asteroids
+		if (mediumrocks[i]->y < -1000 || mediumrocks[i]->y > 1000) {
+			deleteMediumAsteroids(i);
+		}
+	}
+
+	// Move the small asteroids
+	if (game->time % 48 == 0) {
+		spawnSmallAsteroids(random()%640-25, -50, 0, 4);
+	}
+	
+	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (smallrocks[i]) {
+		smallrocks[i]->x += smallrocks[i]->dx;
+		smallrocks[i]->y += smallrocks[i]->dy;
+
+		// Delete small asteroids
+		if (smallrocks[i]->y < -1000 || smallrocks[i]->y > 1000) {
+			deleteSmallAsteroids(i);
 		}
 	}
 
@@ -312,9 +396,21 @@ void loadRender (SDL_Renderer *renderer, GameState *game) {
 		}
 		
 		// Big Asteroid
-		for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (rocks[i]) {
-			SDL_Rect bigrockRect = {rocks[i]->x, rocks[i]->y, 45, 45};
-			SDL_RenderCopy(renderer, game->rock[0], NULL, &bigrockRect);
+		for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (bigrocks[i]) {
+			SDL_Rect bigRockRect = {bigrocks[i]->x, bigrocks[i]->y, 45, 45};
+			SDL_RenderCopy(renderer, game->rock[0], NULL, &bigRockRect);
+		}
+
+		// Medium Asteroid
+		for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (mediumrocks[i]) {
+			SDL_Rect mediumRockRect = {mediumrocks[i]->x, mediumrocks[i]->y, 45, 45};
+			SDL_RenderCopy(renderer, game->rock[1], NULL, &mediumRockRect);
+		}
+
+		// Small Asteroid
+		for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (smallrocks[i]) {
+			SDL_Rect smallRockRect = {smallrocks[i]->x, smallrocks[i]->y, 45, 45};
+			SDL_RenderCopy(renderer, game->rock[2], NULL, &smallRockRect);
 		}
 
 		// Bullets
@@ -373,9 +469,9 @@ int main (int argc, char *argv[]) {
 
 	// Clean Textures
 	SDL_DestroyTexture(gameState.player);
-	SDL_DestroyTexture(gameState.rock[0]);/*
+	SDL_DestroyTexture(gameState.rock[0]);
 	SDL_DestroyTexture(gameState.rock[1]);
-	SDL_DestroyTexture(gameState.rock[2]);*/
+	SDL_DestroyTexture(gameState.rock[2]);
 	SDL_DestroyTexture(gameState.star);
 	SDL_DestroyTexture(gameState.bullet);
 	SDL_DestroyWindow(window);
@@ -402,6 +498,7 @@ int main (int argc, char *argv[]) {
 // https://www.youtube.com/shorts/MZaShGcVBLw
 // https://www.youtube.com/watch?v=OJrX3aNPsHM
 // https://stackoverflow.com/questions/69366699/why-does-the-compiler-is-giving-me-this-undefined-reference-to-function
+// https://www.youtube.com/watch?v=5ccarSklfVM
 
 // to compile gcc -Wall -Werror status.c main.c `sdl2-config --cflags --libs` -o
 
