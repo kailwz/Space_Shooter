@@ -6,9 +6,9 @@
 #include "status.h"
 
 Bullet *bullets[MAXIMUM_PROJECTILES] = { NULL };
-bigRocks *bigrocks[MAXIMUM_ASTEROIDS] = {	NULL};
-mediumRocks *mediumrocks[MAXIMUM_ASTEROIDS] = {	NULL};
-smallRocks *smallrocks[MAXIMUM_ASTEROIDS] = {	NULL};
+bigRocks *bigrocks[MAXIMUM_ASTEROIDS] = {	NULL };
+mediumRocks *mediumrocks[MAXIMUM_ASTEROIDS] = {	NULL };
+smallRocks *smallrocks[MAXIMUM_ASTEROIDS] = {	NULL };
 
 void loadGame (GameState *game) {
 	
@@ -249,7 +249,7 @@ void process (GameState *game) {
 		
 		// Shoot bullets
 		if (state[SDL_SCANCODE_SPACE]) {
-			if (game->time % 12 == 0) {
+			if (game->time % 40 == 0) {
 				spawnBullet(game->move.x+10, game->move.y, 0, -5);
 			}
 		}
@@ -504,37 +504,47 @@ int main (int argc, char *argv[]) {
 
 /*
 // Usefull Player vs enemy collision
-float pw = 24, ph = 24, px = game->move.x, py = game->move.y;
-float rx = game->rocks[0].x, ry = game->rocks[0].y, rw = game->rocks[0].w, rh = game->rocks[0].h;
 
 if (game->status == STATUS_GAME && game->rocks[0].aliveBig) {
-	if (py+ph > ry && py < ry+rh) {
-		if (px < rx+rw && px+pw > rx+rw) {
-			game->move.x = rx+rh;
-			px = rx+rw;
-			game->move.visible = 0;
-			game->move.alive = 0;
+
+	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) {
+		if (game->move.y + 24 > bigrocks[i]->y && game->move.y < bigrocks[i]->y + bigrocks[i]->h) {
+			if (game->move.y > bigrocks[i]->y + bigrocks[i]->h && game->move.y > bigrocks[i]->y) {
+				deleteBigAsteroids(i);
+				deleteBullet(i);
+				printf("boommm!\n\n");
+			}
+			
+			else if (game->move.x + 24 > bigrocks[i]->x && game->move.x < bigrocks[i]->x) {
+				deleteBigAsteroids(i);
+				deleteBullet(i);
+				printf("boommm!\n\n");
+			}
 		}
-		else if (px+pw > rx && px < rx) {
-			game->move.x = rx-pw;
-			px = rx-pw;
-			game->move.visible = 0;
-			game->move.alive = 0;
-		}
-	}
-	if (px+pw > rx && px < rx+rw) {
-		if (py < ry+rh && py > ry) {
-			game->move.y = ry+rw;
-			py = ry+rh;
-			game->move.visible = 0;
-			game->move.alive = 0;
-		}
-		else if (py+ph > ry && py < ry) {
-			game->move.y = ry-ph;
-			py = ry-ph;
-			game->move.visible = 0;
-			game->move.alive = 0;
+
+		if (game->move.x + 24 > bigrocks[i]->x && game->move.x < bigrocks[i]->x + bigrocks[i]->w) {
+			if (game->move.y > bigrocks[i]->y + bigrocks[i]->h && game->move.y > bigrocks[i]->y) {
+				deleteBigAsteroids(i);
+				deleteBullet(i);
+				printf("boommm!\n\n");
+			}
+
+			else if (game->move.y + 24 > bigrocks[i]->y && game->move.y < bigrocks[i]->y) {
+				deleteBigAsteroids(i);
+				deleteBullet(i);
+				printf("boommm!\n\n");
+			}
 		}
 	}
 }
+
+
+// Collision test
+	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (bigrocks[i]) if (bullets[i]) {
+			if (bigrocks[i]->y + bigrocks[i]->h >= bullets[i]->y) {
+				deleteBigAsteroids(i);
+				deleteBullet(i);
+			}
+	}
+
 */
