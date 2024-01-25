@@ -249,8 +249,9 @@ void process (GameState *game) {
 		
 		// Shoot bullets
 		if (state[SDL_SCANCODE_SPACE]) {
+			if (game->time % 6 == 0) {
 				spawnBullet(game->move.x+10, game->move.y, 0, -5);
-			
+			}
 		}
 	}
 
