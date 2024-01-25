@@ -249,9 +249,8 @@ void process (GameState *game) {
 		
 		// Shoot bullets
 		if (state[SDL_SCANCODE_SPACE]) {
-			if (game->time % 40 == 0) {
 				spawnBullet(game->move.x+10, game->move.y, 0, -5);
-			}
+			
 		}
 	}
 
@@ -261,13 +260,13 @@ void process (GameState *game) {
 		bullets[i]->y += bullets[i]->dy;
 
 		// Delete bullets
-		if (bullets[i]->y < -1000 || bullets[i]->y > 1000) {
+		if (bullets[i]->y < 0 || bullets[i]->y > 480) {
 			deleteBullet(i);
 		}
 	}
 
 	// Move the big asteroids
-	if (game->time % 56 == 0) {
+	if (game->time % 40 == 0) {
 		spawnBigAsteroids(random()%640-45, -50, 0, 2);
 	}
 	
@@ -276,13 +275,13 @@ void process (GameState *game) {
 		bigrocks[i]->y += bigrocks[i]->dy;
 
 		// Delete big asteroids
-		if (bigrocks[i]->y < -1000 || bigrocks[i]->y > 1000) {
+		if (bigrocks[i]->y < -50 || bigrocks[i]->y > 480) {
 			deleteBigAsteroids(i);
 		}
 	}
 
 	// Move the medium asteroids
-	if (game->time % 52 == 0) {
+	if (game->time % 40 == 0) {
 		spawnMediumAsteroids(random()%640-35, -50, 0, 3);
 	}
 	
@@ -291,13 +290,13 @@ void process (GameState *game) {
 		mediumrocks[i]->y += mediumrocks[i]->dy;
 
 		// Delete medium asteroids
-		if (mediumrocks[i]->y < -1000 || mediumrocks[i]->y > 1000) {
+		if (mediumrocks[i]->y < -50 || mediumrocks[i]->y > 480) {
 			deleteMediumAsteroids(i);
 		}
 	}
 
 	// Move the small asteroids
-	if (game->time % 48 == 0) {
+	if (game->time % 40 == 0) {
 		spawnSmallAsteroids(random()%640-25, -50, 0, 4);
 	}
 	
@@ -306,7 +305,7 @@ void process (GameState *game) {
 		smallrocks[i]->y += smallrocks[i]->dy;
 
 		// Delete small asteroids
-		if (smallrocks[i]->y < -1000 || smallrocks[i]->y > 1000) {
+		if (smallrocks[i]->y < -50 || smallrocks[i]->y > 480) {
 			deleteSmallAsteroids(i);
 		}
 	}
@@ -340,6 +339,32 @@ void detectColision (GameState *game) {
 		game->move.y = wh;
 	}
 
+	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (bigrocks[i]) if(bullets[i]) {
+		if (bigrocks[i]->y + 45 > bullets[i]->y && bullets[i]->y + 8 > bigrocks[i]->y) {
+			if (bigrocks[i]->x + 45 > bullets[i]->x && bullets[i]->x + 6 > bigrocks[i]->x) {
+				deleteBigAsteroids(i);
+				deleteBullet(i);
+			}
+		}
+	}
+
+	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (mediumrocks[i]) if(bullets[i]) {
+		if (mediumrocks[i]->y + 45 > bullets[i]->y && bullets[i]->y + 8 > mediumrocks[i]->y) {
+			if (mediumrocks[i]->x + 45 > bullets[i]->x && bullets[i]->x + 6 > mediumrocks[i]->x) {
+				deleteMediumAsteroids(i);
+				deleteBullet(i);
+			}
+		}
+	}
+
+	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (smallrocks[i]) if(bullets[i]) {
+		if (smallrocks[i]->y + 45 > bullets[i]->y && bullets[i]->y + 8 > smallrocks[i]->y) {
+			if (smallrocks[i]->x + 45 > bullets[i]->x && bullets[i]->x + 6 > smallrocks[i]->x) {
+				deleteSmallAsteroids(i);
+				deleteBullet(i);
+			}
+		}
+	}
 }
 
 int eventProcessing (SDL_Window *window, GameState *game) {

@@ -4,8 +4,8 @@
 #define STATUS_LIVES 0
 #define STATUS_GAME 1
 #define STATUS_GAMEOVER 2
-#define MAXIMUM_PROJECTILES 1000
-#define MAXIMUM_ASTEROIDS 1000
+#define MAXIMUM_PROJECTILES 3
+#define MAXIMUM_ASTEROIDS 3
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
