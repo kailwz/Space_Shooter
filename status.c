@@ -37,7 +37,7 @@ void draw_player_points (GameState *game) {
 
 	// Player points
 	char point[128] = "";
-	sprintf(point, "%d", (int)game->point);
+	sprintf(point, "points: %d", (int)game->point);
 
 	// Show player points
 	SDL_Surface *pmt = TTF_RenderText_Blended(game->font, point, white);
@@ -50,6 +50,19 @@ void draw_player_points (GameState *game) {
 	// Points
 	SDL_Rect pointsRect = {15, 5, game->pointW, game->pointH};
 	SDL_RenderCopy(renderer, game->points, NULL, &pointsRect);
+
+	// Player lives
+	char lives[128] = "";
+	sprintf(lives, "lives: %d", (int)game->move.lives);
+
+	// Show player lives
+	SDL_Surface *mtp = TTF_RenderText_Blended(game->font, lives, white);
+	game->label = SDL_CreateTextureFromSurface(game->renderer, mtp);
+	SDL_FreeSurface(mtp);
+
+	// lives
+	SDL_Rect livesRect = {15, 35, 95, 55};
+	SDL_RenderCopy(renderer, game->label, NULL, &livesRect);
 }
 
 void shutdown_status_lives (GameState *game) {
