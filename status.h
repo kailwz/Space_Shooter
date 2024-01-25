@@ -3,6 +3,7 @@
 
 void init_status_lives(GameState *game);
 void draw_status_lives(GameState *game);
+void draw_player_points(GameState *game);
 void shutdown_status_lives(GameState *game);
 
 #endif

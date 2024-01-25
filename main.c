@@ -21,9 +21,12 @@ void loadGame (GameState *game) {
 	game->move.visible = 1;
 
 	// Game
+	game->point = 0;
 	game->label = NULL;
 	game->status = STATUS_LIVES;
 	game->move.lives = 3;
+	game->pointW = 15;
+	game->pointH = 55;
 	
 	SDL_Surface *surface = NULL;
 
@@ -251,6 +254,21 @@ void process (GameState *game) {
 		if (state[SDL_SCANCODE_SPACE]) {
 			if (game->time % 6 == 0) {
 				spawnBullet(game->move.x+10, game->move.y, 0, -5);
+				if (game->point >= 10) {
+					game->pointW = 20;
+				}
+				else if (game->point >= 100) {
+					game->pointW = 30;
+				}
+				else if (game->point >= 1000) {
+					game->pointW = 40;
+				}
+				else if (game->point >= 10000) {
+					game->pointW = 50;
+				}
+				else if (game->point >= 100000) {
+					game->pointW = 60;
+				}
 			}
 		}
 	}
@@ -345,6 +363,7 @@ void detectColision (GameState *game) {
 			if (bigrocks[i]->x + 45 > bullets[i]->x && bullets[i]->x + 6 > bigrocks[i]->x) {
 				deleteBigAsteroids(i);
 				deleteBullet(i);
+				game->point++;
 			}
 		}
 	}
@@ -354,6 +373,7 @@ void detectColision (GameState *game) {
 			if (mediumrocks[i]->x + 45 > bullets[i]->x && bullets[i]->x + 6 > mediumrocks[i]->x) {
 				deleteMediumAsteroids(i);
 				deleteBullet(i);
+				game->point++;
 			}
 		}
 	}
@@ -363,6 +383,7 @@ void detectColision (GameState *game) {
 			if (smallrocks[i]->x + 45 > bullets[i]->x && bullets[i]->x + 6 > smallrocks[i]->x) {
 				deleteSmallAsteroids(i);
 				deleteBullet(i);
+				game->point++;
 			}
 		}
 	}
@@ -445,6 +466,7 @@ void loadRender (SDL_Renderer *renderer, GameState *game) {
 			SDL_RenderCopy(renderer, game->bullet, NULL, &bulletRect);
 		}
 
+		draw_player_points(game);
 	}
 
 	SDL_RenderPresent(renderer);
@@ -500,6 +522,7 @@ int main (int argc, char *argv[]) {
 	SDL_DestroyTexture(gameState.rock[2]);
 	SDL_DestroyTexture(gameState.star);
 	SDL_DestroyTexture(gameState.bullet);
+	SDL_DestroyTexture(gameState.points);
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(renderer);
 	TTF_CloseFont(gameState.font);

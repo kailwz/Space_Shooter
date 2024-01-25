@@ -32,6 +32,26 @@ void draw_status_lives (GameState *game) {
 	SDL_RenderCopy(renderer, game->label, NULL, &textRect);
 }
 
+void draw_player_points (GameState *game) {
+	SDL_Color white = {255, 255, 255, 255};
+
+	// Player points
+	char point[128] = "";
+	sprintf(point, "%d", (int)game->point);
+
+	// Show player points
+	SDL_Surface *pmt = TTF_RenderText_Blended(game->font, point, white);
+	game->points = SDL_CreateTextureFromSurface(game->renderer, pmt);
+	SDL_FreeSurface(pmt);
+	
+	// Renderer
+	SDL_Renderer *renderer = game->renderer;
+
+	// Points
+	SDL_Rect pointsRect = {15, 5, game->pointW, game->pointH};
+	SDL_RenderCopy(renderer, game->points, NULL, &pointsRect);
+}
+
 void shutdown_status_lives (GameState *game) {
 	SDL_DestroyTexture(game->label);
 	game->label = NULL;

@@ -33,19 +33,15 @@ typedef struct {
 
 typedef struct {
 	float x, y, w, h, dx, dy;
-	int visibleBig;
-	int aliveBig;
 } mediumRocks;
 
 typedef struct {
 	float x, y, w, h, dx, dy;
-	int visibleBig;
-	int aliveBig;
 } smallRocks;
 
 typedef struct {
-	int time, status, shoot;
-	float x, y, dx;
+	int time, status, shoot, point;
+	float x, y, dx, pointW, pointH;
 
 	// Structures
 	Move move;
@@ -56,6 +52,7 @@ typedef struct {
 	SDL_Texture *player;
 	SDL_Texture *star;
 	SDL_Texture *label;
+	SDL_Texture *points;
 	SDL_Texture *bullet;
 
 	// Fonts
