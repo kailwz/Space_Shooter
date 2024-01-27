@@ -10,6 +10,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 
 typedef struct {
 	float x, y;
@@ -42,6 +43,10 @@ typedef struct {
 typedef struct {
 	int time, status, shoot, point;
 	float x, y, dx, pointW, pointH;
+
+	//Sounds
+	Mix_Music *bgMusic;
+	Mix_Chunk *shipShoot, *roidExplode, *shipExplode;
 
 	// Structures
 	Move move;

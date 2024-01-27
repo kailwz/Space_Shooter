@@ -115,6 +115,31 @@ void loadGame (GameState *game) {
 		SDL_Quit();
 		exit(1);
 	}
+
+	// Load bg sound
+	game->bgMusic = Mix_LoadMUS("sounds/music.mp3");
+	if (game->bgMusic != NULL) {
+		Mix_VolumeMusic(98);
+	}
+
+	// Load shoot sound
+	game->shipShoot = Mix_LoadWAV("sounds/shoot.wav");
+	if (game->shipShoot != NULL) {
+		Mix_VolumeChunk(game->shipShoot, 10);
+	}
+
+	// Load explode sound
+	game->roidExplode = Mix_LoadWAV("sounds/asteroid_explosion.wav");
+	if (game->roidExplode != NULL) {
+		Mix_VolumeChunk(game->roidExplode, 10);
+	}
+
+	// Load ship explode sound
+	game->shipExplode = Mix_LoadWAV("sounds/spaceship_explosion.wav");
+	if (game->shipExplode != NULL) {
+		Mix_VolumeChunk(game->shipExplode, 10);
+	}
+
 	
 	game->bullet = SDL_CreateTextureFromSurface(game->renderer, surface);
 	SDL_FreeSurface(surface);
@@ -252,8 +277,10 @@ void process (GameState *game) {
 		
 		// Shoot bullets
 		if (state[SDL_SCANCODE_SPACE]) {
-			if (game->time % 8 == 0) {
+			if (game->time % 6 == 0) {
 				spawnBullet(game->move.x+10, game->move.y, 0, -5);
+				Mix_PlayChannel(-1, game->shipShoot, 0);
+
 				if (game->point >= 10) {
 					game->pointW = 115;
 				}
@@ -348,6 +375,7 @@ void detectColision (GameState *game) {
 						game->move.x = 295;
 						game->move.y = 215;
 					}
+					Mix_PlayChannel(-1, game->shipExplode, 0);
 					game->point = 0;
 					game->move.alive = 0;
 					game->move.visible = 0;
@@ -364,6 +392,7 @@ void detectColision (GameState *game) {
 						game->move.x = 295;
 						game->move.y = 215;
 					}
+					Mix_PlayChannel(-1, game->shipExplode, 0);
 					game->point = 0;
 					game->move.alive = 0;
 					game->move.visible = 0;
@@ -380,6 +409,7 @@ void detectColision (GameState *game) {
 						game->move.x = 295;
 						game->move.y = 215;
 					}
+					Mix_PlayChannel(-1, game->shipExplode, 0);
 					game->point = 0;
 					game->move.alive = 0;
 					game->move.visible = 0;
@@ -419,6 +449,7 @@ void detectColision (GameState *game) {
 	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (bigrocks[i]) if(bullets[i]) {
 		if (bigrocks[i]->y + 45 > bullets[i]->y && bullets[i]->y + 8 > bigrocks[i]->y) {
 			if (bigrocks[i]->x + 45 > bullets[i]->x && bullets[i]->x + 6 > bigrocks[i]->x) {
+				Mix_PlayChannel(-1, game->roidExplode, 0);
 				deleteBigAsteroids(i);
 				deleteBullet(i);
 				game->point++;
@@ -429,6 +460,7 @@ void detectColision (GameState *game) {
 	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (mediumrocks[i]) if(bullets[i]) {
 		if (mediumrocks[i]->y + 45 > bullets[i]->y && bullets[i]->y + 8 > mediumrocks[i]->y) {
 			if (mediumrocks[i]->x + 45 > bullets[i]->x && bullets[i]->x + 6 > mediumrocks[i]->x) {
+				Mix_PlayChannel(-1, game->roidExplode, 0);
 				deleteMediumAsteroids(i);
 				deleteBullet(i);
 				game->point+=2;
@@ -439,6 +471,7 @@ void detectColision (GameState *game) {
 	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (smallrocks[i]) if(bullets[i]) {
 		if (smallrocks[i]->y + 45 > bullets[i]->y && bullets[i]->y + 8 > smallrocks[i]->y) {
 			if (smallrocks[i]->x + 45 > bullets[i]->x && bullets[i]->x + 6 > smallrocks[i]->x) {
+				Mix_PlayChannel(-1, game->roidExplode, 0);
 				deleteSmallAsteroids(i);
 				deleteBullet(i);
 				game->point+=3;
@@ -537,10 +570,12 @@ int main (int argc, char *argv[]) {
 	SDL_Window *window = NULL;
 	SDL_Renderer *renderer = NULL;
 
-	SDL_Init(SDL_INIT_VIDEO);
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
 	TTF_Init();
 	
+	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
+
 	srandom((int)time(NULL));
 
 	window = SDL_CreateWindow(
@@ -559,6 +594,8 @@ int main (int argc, char *argv[]) {
 	
 	int run = 1;
 	
+	Mix_PlayMusic(gameState.bgMusic, -1);
+
 	// Run the game
 	while (run) {
 		if (eventProcessing(window, &gameState) == 0)
@@ -592,6 +629,13 @@ int main (int argc, char *argv[]) {
 	for (int i = 0; i < MAXIMUM_PROJECTILES; i++) {
 		deleteBullet(i);
 	}
+
+	Mix_FreeMusic(gameState.bgMusic);
+	Mix_FreeChunk(gameState.shipShoot);
+	Mix_FreeChunk(gameState.roidExplode);
+	Mix_FreeChunk(gameState.shipExplode);
+
+	Mix_CloseAudio();
 
 	TTF_Quit();
 
