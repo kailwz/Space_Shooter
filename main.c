@@ -285,7 +285,7 @@ void process (GameState *game) {
 	}
 
 	// Move the big asteroids
-	if (game->time % 12 == 0) {
+	if (game->status == STATUS_GAME && game->time % 12 == 0) {
 		spawnBigAsteroids(random()%640-45, -50, 0, 2);
 	}
 	
@@ -300,7 +300,7 @@ void process (GameState *game) {
 	}
 
 	// Move the medium asteroids
-	if (game->time % 12 == 0) {
+	if (game->status == STATUS_GAME && game->time % 12 == 0) {
 		spawnMediumAsteroids(random()%640-35, -50, 0, 3);
 	}
 	
@@ -315,7 +315,7 @@ void process (GameState *game) {
 	}
 
 	// Move the small asteroids
-	if (game->time % 12 == 0) {
+	if (game->status == STATUS_GAME && game->time % 12 == 0) {
 		spawnSmallAsteroids(random()%640-25, -50, 0, 4);
 	}
 	
@@ -341,31 +341,54 @@ void detectColision (GameState *game) {
 			if (bigrocks[i]->y + 45 > game->move.y && game->move.y + 8 > bigrocks[i]->y) {
 				if (bigrocks[i]->x + 45 > game->move.x && game->move.x + 6 > bigrocks[i]->x) {
 					if (game->move.alive && game->move.visible) {
+						game->time = 0;
 						game->move.lives--;
+						game->status = STATUS_LIVES;
+						init_status_lives(game);
+						game->move.x = 295;
+						game->move.y = 215;
 					}
+					game->point = 0;
 					game->move.alive = 0;
 					game->move.visible = 0;
 				}
 			}
 
-			if (mediumrocks[i]->y + 35 > game->move.y && game->move.y + 8 > mediumrocks[i]->y) {
+			else if (mediumrocks[i]->y + 35 > game->move.y && game->move.y + 8 > mediumrocks[i]->y) {
 				if (mediumrocks[i]->x + 35 > game->move.x && game->move.x + 6 > mediumrocks[i]->x) {
 					if (game->move.alive && game->move.visible) {
+						game->time = 0;
 						game->move.lives--;
+						game->status = STATUS_LIVES;
+						init_status_lives(game);
+						game->move.x = 295;
+						game->move.y = 215;
 					}
+					game->point = 0;
 					game->move.alive = 0;
 					game->move.visible = 0;
 				}
 			}
 
-			if (smallrocks[i]->y + 25 > game->move.y && game->move.y + 8 > smallrocks[i]->y) {
+			else if (smallrocks[i]->y + 25 > game->move.y && game->move.y + 8 > smallrocks[i]->y) {
 				if (smallrocks[i]->x + 25 > game->move.x && game->move.x + 6 > smallrocks[i]->x) {
 					if (game->move.alive && game->move.visible) {
+						game->time = 0;
 						game->move.lives--;
+						game->status = STATUS_LIVES;
+						init_status_lives(game);
+						game->move.x = 295;
+						game->move.y = 215;
 					}
+					game->point = 0;
 					game->move.alive = 0;
 					game->move.visible = 0;
 				}
+			}
+
+			else {
+				game->move.alive = 1;
+				game->move.visible = 1;
 			}
 		}
 	}

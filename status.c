@@ -22,13 +22,13 @@ void draw_status_lives (GameState *game) {
 	SDL_RenderClear(renderer);
 
 	// Player
-	SDL_Rect playerRect = {game->move.x-24, game->move.y, 24, 24};	
+	SDL_Rect playerRect = {295-24, 215, 24, 24};	
 	SDL_RenderCopyEx(renderer, game->player, NULL, &playerRect, 0, NULL, 0);
 
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
 	// Lives
-	SDL_Rect textRect = {game->move.x+24, game->move.y-18, 56, 66};
+	SDL_Rect textRect = {295+24, 215-18, 56, 66};
 	SDL_RenderCopy(renderer, game->label, NULL, &textRect);
 }
 
