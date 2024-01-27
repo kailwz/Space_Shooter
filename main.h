@@ -15,7 +15,7 @@
 typedef struct {
 	float x, y;
 	short lives;
-	int alive, visible;
+	int alive, visible, dead;
 } Move;
 
 typedef struct {
@@ -41,7 +41,7 @@ typedef struct {
 } smallRocks;
 
 typedef struct {
-	int time, status, shoot, point;
+	int time, status, shoot, point, countdown;
 	float x, y, dx, pointW, pointH;
 
 	//Sounds
@@ -57,6 +57,7 @@ typedef struct {
 	SDL_Texture *player;
 	SDL_Texture *star;
 	SDL_Texture *label;
+	SDL_Texture *labelOver;
 	SDL_Texture *points;
 	SDL_Texture *bullet;
 

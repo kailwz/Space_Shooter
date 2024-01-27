@@ -11,22 +11,25 @@ mediumRocks *mediumrocks[MAXIMUM_ASTEROIDS] = {	NULL };
 smallRocks *smallrocks[MAXIMUM_ASTEROIDS] = {	NULL };
 
 void loadGame (GameState *game) {
-	
+	// time
 	game->time = 0;
 
 	// Player
 	game->move.x = 295;
 	game->move.y = 215;
+	game->move.dead = 0;
 	game->move.alive = 1;
 	game->move.visible = 1;
 
 	// Game
 	game->point = 0;
 	game->label = NULL;
+	game->labelOver = NULL;
 	game->status = STATUS_LIVES;
 	game->move.lives = 3;
 	game->pointW = 105;
 	game->pointH = 55;
+	game->countdown = -1;
 	
 	SDL_Surface *surface = NULL;
 
@@ -140,7 +143,7 @@ void loadGame (GameState *game) {
 		Mix_VolumeChunk(game->shipExplode, 10);
 	}
 
-	
+	// Load bullet
 	game->bullet = SDL_CreateTextureFromSurface(game->renderer, surface);
 	SDL_FreeSurface(surface);
 
@@ -252,15 +255,25 @@ void deleteSmallAsteroids (int i) {
 
 void process (GameState *game) {
 	game->time++;
-		
+
 	// Time that the text will apear in the screen
-	if (game->time > 250) {
-		shutdown_status_lives(game);
-		game->status = STATUS_GAME;
+	if (game->status == STATUS_LIVES) {
+		if (game->time > 250) {
+			shutdown_status_lives(game);
+			game->status = STATUS_GAME;
+		}
+	}
+
+	else if (game->status == STATUS_GAMEOVER) {
+		if (game->time > 250) {
+			shutdown_game_over(game);
+			SDL_Quit();
+			exit(0);
+		}
 	}
 
 	// Player Movements
-	if (game->status == STATUS_GAME && game->move.alive) {
+	else if (game->status == STATUS_GAME) {
 		const Uint8 *state = SDL_GetKeyboardState(NULL);
 		if (state[SDL_SCANCODE_A]) {
 			game->move.x -= 5;
@@ -356,6 +369,35 @@ void process (GameState *game) {
 		}
 	}
 
+	if (game->status == STATUS_GAME) {
+		if (game->move.dead && game->countdown < 0) {
+			game->countdown = 1;
+		}
+
+		if (game->countdown >= 0) {
+			game->countdown--;
+
+			if (game->countdown < 0) {
+				game->move.lives--;
+
+				if (game->move.lives >= 0) {
+					init_status_lives(game);
+					game->status = STATUS_LIVES;
+					game->time = 0;
+
+					game->move.dead = 0;
+					game->move.x = 295;
+					game->move.y = 215;
+				}
+				else {
+					init_game_over(game);
+					game->status = STATUS_GAMEOVER;
+					game->time = 0;
+				}
+			}
+		}
+	}
+
 }
 
 void detectColision (GameState *game) {
@@ -367,58 +409,26 @@ void detectColision (GameState *game) {
 		for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (bigrocks[i]) if (mediumrocks[i]) if (smallrocks[i]) {
 			if (bigrocks[i]->y + 45 > game->move.y && game->move.y + 8 > bigrocks[i]->y) {
 				if (bigrocks[i]->x + 45 > game->move.x && game->move.x + 6 > bigrocks[i]->x) {
-					if (game->move.alive && game->move.visible) {
-						game->time = 0;
-						game->move.lives--;
-						game->status = STATUS_LIVES;
-						init_status_lives(game);
-						game->move.x = 295;
-						game->move.y = 215;
-					}
 					Mix_PlayChannel(-1, game->shipExplode, 0);
 					game->point = 0;
-					game->move.alive = 0;
-					game->move.visible = 0;
+					game->move.dead = 1;
 				}
 			}
 
 			else if (mediumrocks[i]->y + 35 > game->move.y && game->move.y + 8 > mediumrocks[i]->y) {
 				if (mediumrocks[i]->x + 35 > game->move.x && game->move.x + 6 > mediumrocks[i]->x) {
-					if (game->move.alive && game->move.visible) {
-						game->time = 0;
-						game->move.lives--;
-						game->status = STATUS_LIVES;
-						init_status_lives(game);
-						game->move.x = 295;
-						game->move.y = 215;
-					}
 					Mix_PlayChannel(-1, game->shipExplode, 0);
 					game->point = 0;
-					game->move.alive = 0;
-					game->move.visible = 0;
+					game->move.dead = 1;
 				}
 			}
 
 			else if (smallrocks[i]->y + 25 > game->move.y && game->move.y + 8 > smallrocks[i]->y) {
 				if (smallrocks[i]->x + 25 > game->move.x && game->move.x + 6 > smallrocks[i]->x) {
-					if (game->move.alive && game->move.visible) {
-						game->time = 0;
-						game->move.lives--;
-						game->status = STATUS_LIVES;
-						init_status_lives(game);
-						game->move.x = 295;
-						game->move.y = 215;
-					}
 					Mix_PlayChannel(-1, game->shipExplode, 0);
 					game->point = 0;
-					game->move.alive = 0;
-					game->move.visible = 0;
+					game->move.dead = 1;
 				}
-			}
-
-			else {
-				game->move.alive = 1;
-				game->move.visible = 1;
 			}
 		}
 	}
@@ -509,10 +519,13 @@ int eventProcessing (SDL_Window *window, GameState *game) {
 }
 
 void loadRender (SDL_Renderer *renderer, GameState *game) {
-		
 	// Draw the lives on the screen
 	if (game->status == STATUS_LIVES) {
 		draw_status_lives(game);
+	}
+
+	if (game->status == STATUS_GAMEOVER) {
+		draw_game_over(game);
 	}
 
 	// Start the game after the lives screen
@@ -643,59 +656,3 @@ int main (int argc, char *argv[]) {
 
 	return 0;
 }
-
-// How to Program a Game in C Tutorial
-// https://www.youtube.com/watch?v=FCRmIoX6PTA&list=PLT6WFYYZE6uLMcPGS3qfpYm7T_gViYMMt&index=21
-// https://www.youtube.com/shorts/MZaShGcVBLw
-// https://www.youtube.com/watch?v=OJrX3aNPsHM
-// https://stackoverflow.com/questions/69366699/why-does-the-compiler-is-giving-me-this-undefined-reference-to-function
-// https://www.youtube.com/watch?v=5ccarSklfVM
-
-// to compile gcc -Wall -Werror status.c main.c `sdl2-config --cflags --libs` -o
-
-/*
-// Usefull Player vs enemy collision
-
-if (game->status == STATUS_GAME && game->rocks[0].aliveBig) {
-
-	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) {
-		if (game->move.y + 24 > bigrocks[i]->y && game->move.y < bigrocks[i]->y + bigrocks[i]->h) {
-			if (game->move.y > bigrocks[i]->y + bigrocks[i]->h && game->move.y > bigrocks[i]->y) {
-				deleteBigAsteroids(i);
-				deleteBullet(i);
-				printf("boommm!\n\n");
-			}
-			
-			else if (game->move.x + 24 > bigrocks[i]->x && game->move.x < bigrocks[i]->x) {
-				deleteBigAsteroids(i);
-				deleteBullet(i);
-				printf("boommm!\n\n");
-			}
-		}
-
-		if (game->move.x + 24 > bigrocks[i]->x && game->move.x < bigrocks[i]->x + bigrocks[i]->w) {
-			if (game->move.y > bigrocks[i]->y + bigrocks[i]->h && game->move.y > bigrocks[i]->y) {
-				deleteBigAsteroids(i);
-				deleteBullet(i);
-				printf("boommm!\n\n");
-			}
-
-			else if (game->move.y + 24 > bigrocks[i]->y && game->move.y < bigrocks[i]->y) {
-				deleteBigAsteroids(i);
-				deleteBullet(i);
-				printf("boommm!\n\n");
-			}
-		}
-	}
-}
-
-
-// Collision test
-	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (bigrocks[i]) if (bullets[i]) {
-			if (bigrocks[i]->y + bigrocks[i]->h >= bullets[i]->y) {
-				deleteBigAsteroids(i);
-				deleteBullet(i);
-			}
-	}
-
-*/

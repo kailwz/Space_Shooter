@@ -69,3 +69,30 @@ void shutdown_status_lives (GameState *game) {
 	SDL_DestroyTexture(game->label);
 	game->label = NULL;
 }
+
+void init_game_over (GameState *game) {
+	SDL_Color white = {255, 255, 255, 255};
+
+	// Show player lives
+	SDL_Surface *ptm = TTF_RenderText_Blended(game->font, "Game Over", white);
+	game->labelOver = SDL_CreateTextureFromSurface(game->renderer, ptm);
+	SDL_FreeSurface(ptm);
+}
+
+void draw_game_over (GameState *game) {
+	SDL_Renderer *renderer = game->renderer;
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+
+	SDL_RenderClear(renderer);
+
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+	// Death
+	SDL_Rect deathRect = {640 / 2 - 48, 480 / 2 - 48, 135, 75};
+	SDL_RenderCopy(renderer, game->labelOver, NULL, &deathRect);
+}
+
+void shutdown_game_over (GameState *game) {
+	SDL_DestroyTexture(game->labelOver);
+	game->labelOver = NULL;
+}
