@@ -1,5 +1,7 @@
 <h1>Space Shooter</h1>
 
+<img src="/media/game.png">
+
 <blockquote>Simple Space Shooter game in c.</blockquote>
 
 <h2>An old school looking game</h2>
