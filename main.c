@@ -546,12 +546,12 @@ void detectColision (GameState *game) {
 				Mix_PlayChannel(-1, game->roidExplode, 0);
 				deleteUfos(i);
 				deleteBullet(i);
-				game->point+=5;
+				game->point+=3;
 			}
 		}
 	}
 
-	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (ufoship[i]) if(bullets[i]) {
+	for (int i = 0; i < MAXIMUM_UFOS; i++) if (ufoship[i]) if(bullets[i]) {
 		if (ufoship[i]->y + 45 > bullets[i]->y && bullets[i]->y + 8 > ufoship[i]->y) {
 			if (ufoship[i]->x + 45 > bullets[i]->x && bullets[i]->x + 6 > ufoship[i]->x) {
 				Mix_PlayChannel(-1, game->roidExplode, 0);
@@ -736,3 +736,59 @@ int main (int argc, char *argv[]) {
 
 	return 0;
 }
+
+// How to Program a Game in C Tutorial
+// https://www.youtube.com/watch?v=FCRmIoX6PTA&list=PLT6WFYYZE6uLMcPGS3qfpYm7T_gViYMMt&index=21
+// https://www.youtube.com/shorts/MZaShGcVBLw
+// https://www.youtube.com/watch?v=OJrX3aNPsHM
+// https://stackoverflow.com/questions/69366699/why-does-the-compiler-is-giving-me-this-undefined-reference-to-function
+// https://www.youtube.com/watch?v=5ccarSklfVM
+
+// to compile gcc -Wall -Werror status.c main.c `sdl2-config --cflags --libs` -o
+
+/*
+// Usefull Player vs enemy collision
+
+if (game->status == STATUS_GAME && game->rocks[0].aliveBig) {
+
+	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) {
+		if (game->move.y + 24 > bigrocks[i]->y && game->move.y < bigrocks[i]->y + bigrocks[i]->h) {
+			if (game->move.y > bigrocks[i]->y + bigrocks[i]->h && game->move.y > bigrocks[i]->y) {
+				deleteBigAsteroids(i);
+				deleteBullet(i);
+				printf("boommm!\n\n");
+			}
+			
+			else if (game->move.x + 24 > bigrocks[i]->x && game->move.x < bigrocks[i]->x) {
+				deleteBigAsteroids(i);
+				deleteBullet(i);
+				printf("boommm!\n\n");
+			}
+		}
+
+		if (game->move.x + 24 > bigrocks[i]->x && game->move.x < bigrocks[i]->x + bigrocks[i]->w) {
+			if (game->move.y > bigrocks[i]->y + bigrocks[i]->h && game->move.y > bigrocks[i]->y) {
+				deleteBigAsteroids(i);
+				deleteBullet(i);
+				printf("boommm!\n\n");
+			}
+
+			else if (game->move.y + 24 > bigrocks[i]->y && game->move.y < bigrocks[i]->y) {
+				deleteBigAsteroids(i);
+				deleteBullet(i);
+				printf("boommm!\n\n");
+			}
+		}
+	}
+}
+
+
+// Collision test
+	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (bigrocks[i]) if (bullets[i]) {
+			if (bigrocks[i]->y + bigrocks[i]->h >= bullets[i]->y) {
+				deleteBigAsteroids(i);
+				deleteBullet(i);
+			}
+	}
+
+*/
