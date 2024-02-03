@@ -135,25 +135,25 @@ void loadGame (GameState *game) {
 	// Load bg sound
 	game->bgMusic = Mix_LoadMUS("sounds/music.mp3");
 	if (game->bgMusic != NULL) {
-		Mix_VolumeMusic(98);
+		Mix_VolumeMusic(40);
 	}
 
 	// Load shoot sound
 	game->shipShoot = Mix_LoadWAV("sounds/shoot.wav");
 	if (game->shipShoot != NULL) {
-		Mix_VolumeChunk(game->shipShoot, 10);
+		Mix_VolumeChunk(game->shipShoot, 20);
 	}
 
 	// Load explode sound
 	game->roidExplode = Mix_LoadWAV("sounds/asteroid_explosion.wav");
 	if (game->roidExplode != NULL) {
-		Mix_VolumeChunk(game->roidExplode, 10);
+		Mix_VolumeChunk(game->roidExplode, 20);
 	}
 
 	// Load ship explode sound
 	game->shipExplode = Mix_LoadWAV("sounds/spaceship_explosion.wav");
 	if (game->shipExplode != NULL) {
-		Mix_VolumeChunk(game->shipExplode, 10);
+		Mix_VolumeChunk(game->shipExplode, 20);
 	}
 
 	// Load bullet

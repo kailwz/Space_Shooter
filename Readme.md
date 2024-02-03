@@ -18,7 +18,7 @@
   <li>Programer: me</li>
   <li>Art Design: me</li>
   <li>Sound Effects: Me.</li>
-  <li>Music: New Direction by KevinMacleod.</li>
+  <li>Music: Music for Arcade Style Game by lucadialessandro.</li>
 </ul>
 
 <blockquote>*Note To open just execute the "a.out" file*</blockquote>
