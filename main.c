@@ -9,6 +9,7 @@ Bullet *bullets[MAXIMUM_PROJECTILES] = { NULL };
 bigRocks *bigrocks[MAXIMUM_ASTEROIDS] = {	NULL };
 mediumRocks *mediumrocks[MAXIMUM_ASTEROIDS] = {	NULL };
 smallRocks *smallrocks[MAXIMUM_ASTEROIDS] = {	NULL };
+ufoShip *ufoship[MAXIMUM_UFOS] = { NULL };
 
 void loadGame (GameState *game) {
 	// time
@@ -97,6 +98,18 @@ void loadGame (GameState *game) {
 	}
 	
 	game->rock[2] = SDL_CreateTextureFromSurface(game->renderer, surface);
+	SDL_FreeSurface(surface);
+
+	// Ufo image
+	surface = IMG_Load("images/ufo.png");
+
+	if (surface == NULL) {
+		printf("Could not find ufo.png\n\n");
+		SDL_Quit();
+		exit(1);
+	}
+	
+	game->ufo = SDL_CreateTextureFromSurface(game->renderer, surface);
 	SDL_FreeSurface(surface);
 
 	// Screen text
@@ -253,6 +266,32 @@ void deleteSmallAsteroids (int i) {
 	}
 }
 
+void spawnUfos (float x, float y, float dx, float dy) {
+	int found = -1;
+	for (int i = 0; i < MAXIMUM_UFOS; i++) {
+		if (ufoship[i] == NULL) {
+			found = i;
+			break;
+		}
+	}
+
+	if (found >= 0) {
+		int i = found;
+		ufoship[i] = malloc(sizeof(ufoShip));
+		ufoship[i]->x = x;
+		ufoship[i]->y = y;
+		ufoship[i]->dx = dx;
+		ufoship[i]->dy = dy;
+	}
+}
+
+void deleteUfos (int i) {
+	if (ufoship[i]) {
+		free(ufoship[i]);
+		ufoship[i] = NULL;
+	}
+}
+
 void process (GameState *game) {
 	game->time++;
 
@@ -369,6 +408,21 @@ void process (GameState *game) {
 		}
 	}
 
+	// Move Ufos
+	if (game->status == STATUS_GAME && game->time % 12 == 0) {
+		spawnUfos(690, random()%480-32, -3, 0);
+	}
+	
+	for (int i = 0; i < MAXIMUM_UFOS; i++) if (ufoship[i]) {
+		ufoship[i]->x += ufoship[i]->dx;
+		ufoship[i]->y += ufoship[i]->dy;
+
+		// Delete small asteroids
+		if (ufoship[i]->x < -50 || ufoship[i]->x > 690) {
+			deleteUfos(i);
+		}
+	}
+
 	if (game->status == STATUS_GAME) {
 		if (game->move.dead && game->countdown < 0) {
 			game->countdown = 1;
@@ -406,7 +460,7 @@ void detectColision (GameState *game) {
 	
 	// Player colision
 	if (game->status == STATUS_GAME) {
-		for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (bigrocks[i]) if (mediumrocks[i]) if (smallrocks[i]) {
+		for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (bigrocks[i]) if (mediumrocks[i]) if (smallrocks[i]) if (ufoship[i]) {
 			if (bigrocks[i]->y + 45 > game->move.y && game->move.y + 8 > bigrocks[i]->y) {
 				if (bigrocks[i]->x + 45 > game->move.x && game->move.x + 6 > bigrocks[i]->x) {
 					Mix_PlayChannel(-1, game->shipExplode, 0);
@@ -425,6 +479,14 @@ void detectColision (GameState *game) {
 
 			else if (smallrocks[i]->y + 25 > game->move.y && game->move.y + 8 > smallrocks[i]->y) {
 				if (smallrocks[i]->x + 25 > game->move.x && game->move.x + 6 > smallrocks[i]->x) {
+					Mix_PlayChannel(-1, game->shipExplode, 0);
+					game->point = 0;
+					game->move.dead = 1;
+				}
+			}
+
+			else if (ufoship[i]->y + 25 > game->move.y && game->move.y + 8 > ufoship[i]->y) {
+				if (ufoship[i]->x + 25 > game->move.x && game->move.x + 6 > ufoship[i]->x) {
 					Mix_PlayChannel(-1, game->shipExplode, 0);
 					game->point = 0;
 					game->move.dead = 1;
@@ -482,9 +544,20 @@ void detectColision (GameState *game) {
 		if (smallrocks[i]->y + 45 > bullets[i]->y && bullets[i]->y + 8 > smallrocks[i]->y) {
 			if (smallrocks[i]->x + 45 > bullets[i]->x && bullets[i]->x + 6 > smallrocks[i]->x) {
 				Mix_PlayChannel(-1, game->roidExplode, 0);
-				deleteSmallAsteroids(i);
+				deleteUfos(i);
 				deleteBullet(i);
-				game->point+=3;
+				game->point+=5;
+			}
+		}
+	}
+
+	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (ufoship[i]) if(bullets[i]) {
+		if (ufoship[i]->y + 45 > bullets[i]->y && bullets[i]->y + 8 > ufoship[i]->y) {
+			if (ufoship[i]->x + 45 > bullets[i]->x && bullets[i]->x + 6 > ufoship[i]->x) {
+				Mix_PlayChannel(-1, game->roidExplode, 0);
+				deleteUfos(i);
+				deleteBullet(i);
+				game->point+=5;
 			}
 		}
 	}
@@ -564,6 +637,12 @@ void loadRender (SDL_Renderer *renderer, GameState *game) {
 			SDL_RenderCopy(renderer, game->rock[2], NULL, &smallRockRect);
 		}
 
+		// Ufo
+		for (int i = 0; i < MAXIMUM_UFOS; i++) if (ufoship[i]) {
+			SDL_Rect ufoRect = {ufoship[i]->x, ufoship[i]->y, 32, 32};
+			SDL_RenderCopy(renderer, game->ufo, NULL, &ufoRect);
+		}
+
 		// Bullets
 		for (int i = 0; i < MAXIMUM_PROJECTILES; i++) if (bullets[i]) {
 			SDL_Rect bulletRect = {bullets[i]->x, bullets[i]->y, 6, 8};
@@ -625,6 +704,7 @@ int main (int argc, char *argv[]) {
 
 	// Clean Textures
 	SDL_DestroyTexture(gameState.player);
+	SDL_DestroyTexture(gameState.ufo);
 	SDL_DestroyTexture(gameState.rock[0]);
 	SDL_DestroyTexture(gameState.rock[1]);
 	SDL_DestroyTexture(gameState.rock[2]);

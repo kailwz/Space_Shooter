@@ -6,6 +6,7 @@
 #define STATUS_GAMEOVER 2
 #define MAXIMUM_PROJECTILES 3
 #define MAXIMUM_ASTEROIDS 3
+#define MAXIMUM_UFOS 1
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -41,6 +42,10 @@ typedef struct {
 } smallRocks;
 
 typedef struct {
+	float x, y, w, h, dx, dy;
+} ufoShip;
+
+typedef struct {
 	int time, status, shoot, point, countdown;
 	float x, y, dx, pointW, pointH;
 
@@ -55,6 +60,7 @@ typedef struct {
 	// Textures
 	SDL_Texture *rock[3];
 	SDL_Texture *player;
+	SDL_Texture *ufo;
 	SDL_Texture *star;
 	SDL_Texture *label;
 	SDL_Texture *labelOver;
