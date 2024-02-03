@@ -11,6 +11,8 @@
   <li>If you loose all your lifes... YOUR DONE!</li>
 </ul>
 
+<h2><blockquote>*Caution* U.F.O'S may hit you!</blockquote></h2>
+
 <h2>Credits</h2>
 <ul>
   <li>Programer: me</li>
