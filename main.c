@@ -544,7 +544,7 @@ void detectColision (GameState *game) {
 		if (smallrocks[i]->y + 45 > bullets[i]->y && bullets[i]->y + 8 > smallrocks[i]->y) {
 			if (smallrocks[i]->x + 45 > bullets[i]->x && bullets[i]->x + 6 > smallrocks[i]->x) {
 				Mix_PlayChannel(-1, game->roidExplode, 0);
-				deleteUfos(i);
+				deleteSmallAsteroids(i);
 				deleteBullet(i);
 				game->point+=3;
 			}
