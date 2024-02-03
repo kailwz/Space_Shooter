@@ -461,32 +461,32 @@ void detectColision (GameState *game) {
 	// Player colision
 	if (game->status == STATUS_GAME) {
 		for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (bigrocks[i]) if (mediumrocks[i]) if (smallrocks[i]) if (ufoship[i]) {
-			if (bigrocks[i]->y + 45 > game->move.y && game->move.y + 8 > bigrocks[i]->y) {
-				if (bigrocks[i]->x + 45 > game->move.x && game->move.x + 6 > bigrocks[i]->x) {
+			if (bigrocks[i]->y + 45 > game->move.y && game->move.y + 24 > bigrocks[i]->y) {
+				if (bigrocks[i]->x + 45 > game->move.x && game->move.x + 24 > bigrocks[i]->x) {
 					Mix_PlayChannel(-1, game->shipExplode, 0);
 					game->point = 0;
 					game->move.dead = 1;
 				}
 			}
 
-			else if (mediumrocks[i]->y + 35 > game->move.y && game->move.y + 8 > mediumrocks[i]->y) {
-				if (mediumrocks[i]->x + 35 > game->move.x && game->move.x + 6 > mediumrocks[i]->x) {
+			else if (mediumrocks[i]->y + 35 > game->move.y && game->move.y + 24 > mediumrocks[i]->y) {
+				if (mediumrocks[i]->x + 35 > game->move.x && game->move.x + 24 > mediumrocks[i]->x) {
 					Mix_PlayChannel(-1, game->shipExplode, 0);
 					game->point = 0;
 					game->move.dead = 1;
 				}
 			}
 
-			else if (smallrocks[i]->y + 25 > game->move.y && game->move.y + 8 > smallrocks[i]->y) {
-				if (smallrocks[i]->x + 25 > game->move.x && game->move.x + 6 > smallrocks[i]->x) {
+			else if (smallrocks[i]->y + 25 > game->move.y && game->move.y + 24 > smallrocks[i]->y) {
+				if (smallrocks[i]->x + 25 > game->move.x && game->move.x + 24 > smallrocks[i]->x) {
 					Mix_PlayChannel(-1, game->shipExplode, 0);
 					game->point = 0;
 					game->move.dead = 1;
 				}
 			}
 
-			else if (ufoship[i]->y + 25 > game->move.y && game->move.y + 8 > ufoship[i]->y) {
-				if (ufoship[i]->x + 25 > game->move.x && game->move.x + 6 > ufoship[i]->x) {
+			else if (ufoship[i]->y + 25 > game->move.y && game->move.y + 24 > ufoship[i]->y) {
+				if (ufoship[i]->x + 25 > game->move.x && game->move.x + 24 > ufoship[i]->x) {
 					Mix_PlayChannel(-1, game->shipExplode, 0);
 					game->point = 0;
 					game->move.dead = 1;
@@ -520,7 +520,7 @@ void detectColision (GameState *game) {
 	// Asteroids colision
 	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (bigrocks[i]) if(bullets[i]) {
 		if (bigrocks[i]->y + 45 > bullets[i]->y && bullets[i]->y + 8 > bigrocks[i]->y) {
-			if (bigrocks[i]->x + 45 > bullets[i]->x && bullets[i]->x + 6 > bigrocks[i]->x) {
+			if (bigrocks[i]->x + 45 > bullets[i]->x && bullets[i]->x + 8 > bigrocks[i]->x) {
 				Mix_PlayChannel(-1, game->roidExplode, 0);
 				deleteBigAsteroids(i);
 				deleteBullet(i);
@@ -531,7 +531,7 @@ void detectColision (GameState *game) {
 
 	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (mediumrocks[i]) if(bullets[i]) {
 		if (mediumrocks[i]->y + 45 > bullets[i]->y && bullets[i]->y + 8 > mediumrocks[i]->y) {
-			if (mediumrocks[i]->x + 45 > bullets[i]->x && bullets[i]->x + 6 > mediumrocks[i]->x) {
+			if (mediumrocks[i]->x + 45 > bullets[i]->x && bullets[i]->x + 8 > mediumrocks[i]->x) {
 				Mix_PlayChannel(-1, game->roidExplode, 0);
 				deleteMediumAsteroids(i);
 				deleteBullet(i);
@@ -542,7 +542,7 @@ void detectColision (GameState *game) {
 
 	for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (smallrocks[i]) if(bullets[i]) {
 		if (smallrocks[i]->y + 45 > bullets[i]->y && bullets[i]->y + 8 > smallrocks[i]->y) {
-			if (smallrocks[i]->x + 45 > bullets[i]->x && bullets[i]->x + 6 > smallrocks[i]->x) {
+			if (smallrocks[i]->x + 45 > bullets[i]->x && bullets[i]->x + 8 > smallrocks[i]->x) {
 				Mix_PlayChannel(-1, game->roidExplode, 0);
 				deleteSmallAsteroids(i);
 				deleteBullet(i);
@@ -553,7 +553,7 @@ void detectColision (GameState *game) {
 
 	for (int i = 0; i < MAXIMUM_UFOS; i++) if (ufoship[i]) if(bullets[i]) {
 		if (ufoship[i]->y + 45 > bullets[i]->y && bullets[i]->y + 8 > ufoship[i]->y) {
-			if (ufoship[i]->x + 45 > bullets[i]->x && bullets[i]->x + 6 > ufoship[i]->x) {
+			if (ufoship[i]->x + 45 > bullets[i]->x && bullets[i]->x + 8 > ufoship[i]->x) {
 				Mix_PlayChannel(-1, game->roidExplode, 0);
 				deleteUfos(i);
 				deleteBullet(i);
@@ -645,7 +645,7 @@ void loadRender (SDL_Renderer *renderer, GameState *game) {
 
 		// Bullets
 		for (int i = 0; i < MAXIMUM_PROJECTILES; i++) if (bullets[i]) {
-			SDL_Rect bulletRect = {bullets[i]->x, bullets[i]->y, 6, 8};
+			SDL_Rect bulletRect = {bullets[i]->x, bullets[i]->y, 8, 8};
 			SDL_RenderCopy(renderer, game->bullet, NULL, &bulletRect);
 		}
 
