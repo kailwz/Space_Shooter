@@ -52,6 +52,7 @@ typedef struct {
 	//Sounds
 	Mix_Music *bgMusic;
 	Mix_Chunk *shipShoot, *roidExplode, *shipExplode;
+	bigRocks bigrocks[MAXIMUM_ASTEROIDS];
 
 	// Structures
 	Move move;

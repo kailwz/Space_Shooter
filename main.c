@@ -458,9 +458,9 @@ void detectColision (GameState *game) {
 	float space = 0, ww = 640 - 24, wh = 480 - 24;
 	float px = game->move.x, py = game->move.y;
 	
-	// Player colision
+	// Player asteroids colision
 	if (game->status == STATUS_GAME) {
-		for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (bigrocks[i]) if (mediumrocks[i]) if (smallrocks[i]) if (ufoship[i]) {
+		for (int i = 0; i < MAXIMUM_ASTEROIDS; i++) if (bigrocks[i]) if (mediumrocks[i]) if (smallrocks[i]) {
 			if (bigrocks[i]->y + 45 > game->move.y && game->move.y + 24 > bigrocks[i]->y) {
 				if (bigrocks[i]->x + 45 > game->move.x && game->move.x + 24 > bigrocks[i]->x) {
 					Mix_PlayChannel(-1, game->shipExplode, 0);
@@ -484,8 +484,10 @@ void detectColision (GameState *game) {
 					game->move.dead = 1;
 				}
 			}
+		}
 
-			else if (ufoship[i]->y + 25 > game->move.y && game->move.y + 24 > ufoship[i]->y) {
+		for (int i = 0; i < MAXIMUM_UFOS; i++) if (ufoship[i]) {
+			if (ufoship[i]->y + 25 > game->move.y && game->move.y + 24 > ufoship[i]->y) {
 				if (ufoship[i]->x + 25 > game->move.x && game->move.x + 24 > ufoship[i]->x) {
 					Mix_PlayChannel(-1, game->shipExplode, 0);
 					game->point = 0;
