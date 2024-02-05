@@ -31,6 +31,8 @@ void loadGame (GameState *game) {
 	game->pointW = 105;
 	game->pointH = 55;
 	game->countdown = -1;
+	game->cooldown = 0;
+	game->soundcooldown = 0;
 	
 	SDL_Surface *surface = NULL;
 
@@ -294,6 +296,8 @@ void deleteUfos (int i) {
 
 void process (GameState *game) {
 	game->time++;
+	game->cooldown++;
+	game->soundcooldown++;
 
 	// Time that the text will apear in the screen
 	if (game->status == STATUS_LIVES) {
@@ -329,9 +333,13 @@ void process (GameState *game) {
 		
 		// Shoot bullets
 		if (state[SDL_SCANCODE_SPACE]) {
-			if (game->time % 6 == 0) {
-				spawnBullet(game->move.x+10, game->move.y, 0, -5);
+			if (game->soundcooldown >= 20) {
 				Mix_PlayChannel(-1, game->shipShoot, 0);
+      	game->soundcooldown = 0;
+      }
+
+			if (game->cooldown >= 10) {
+				spawnBullet(game->move.x+10, game->move.y, 0, -5);
 
 				if (game->point >= 10) {
 					game->pointW = 115;
@@ -348,6 +356,7 @@ void process (GameState *game) {
 				else if (game->point >= 100000) {
 					game->pointW = 155;
 				}
+				game->cooldown = 0;
 			}
 		}
 	}

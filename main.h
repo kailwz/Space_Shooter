@@ -46,7 +46,7 @@ typedef struct {
 } ufoShip;
 
 typedef struct {
-	int time, status, shoot, point, countdown;
+	int time, status, shoot, point, countdown, cooldown, soundcooldown;
 	float x, y, dx, pointW, pointH;
 
 	//Sounds
